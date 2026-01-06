@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ocean-Learn — Learn Smarter, Dive Deeper</title>
+  <meta name="description" content="Ocean-Learn is a modern learning platform for students. Interactive lessons, quizzes, and progress tracking." />
+  <style>
+    :root{
+      --bg0:#030712;
+      --bg1:#06122a;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.10);
+      --line: rgba(255,255,255,.12);
+      --text:#EAF2FF;
+      --muted: rgba(234,242,255,.72);
+      --accent:#38BDF8;   /* sky */
+      --accent2:#22C55E;  /* sea green */
+      --warn:#F59E0B;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(900px 600px at 20% 10%, rgba(56,189,248,.22), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(34,197,94,.16), transparent 60%),
+        radial-gradient(900px 700px at 50% 90%, rgba(245,158,11,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg0) 60%);
+      overflow-x:hidden;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(1100px, 92vw); margin:0 auto; }
+
+    /* Top Nav */
+    .nav{
+      position:sticky; top:0; z-index:30;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(3,7,18,.82), rgba(3,7,18,.35));
+      border-bottom:1px solid var(--line);
+    }
+    .nav-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 55%),
+        linear-gradient(135deg, rgba(56,189,248,.95), rgba(34,197,94,.70));
+      box-shadow: 0 12px 28px rgba(56,189,248,.18);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-30% -20%;
+      background: radial-gradient(circle at 50% 70%, rgba(255,255,255,.25), transparent 55%);
+      transform: rotate(25deg);
+    }
+    .brand span{ font-size:16px; }
+    .nav-links{
+      display:flex; gap:18px; align-items:center;
+      color:var(--muted);
+      font-weight:600;
+    }
+    .nav-links a{ padding:10px 10px; border-radius:12px; }
+    .nav-links a:hover{ background: rgba(255,255,255,.06); color:var(--text); }
+
+    .nav-cta{ display:flex; gap:10px; align-items:center; }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:700;
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); }
+    .btn.primary{
+      border:1px solid rgba(56,189,248,.35);
+      background: linear-gradient(135deg, rgba(56,189,248,.95), rgba(34,197,94,.70));
+      color:#06122a;
+    }
+    .btn.primary:hover{ transform: translateY(-1px); filter:saturate(1.05) brightness(1.02); }
+
+    .hamburger{
+      display:none;
+      width:44px; height:44px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      cursor:pointer;
+      align-items:center; justify-content:center;
+    }
+    .hamburger div{
+      width:20px; height:2px; background: rgba(234,242,255,.85);
+      position:relative;
+    }
+    .hamburger div:before,.hamburger div:after{
+      content:""; position:absolute; left:0;
+      width:20px; height:2px; background: rgba(234,242,255,.85);
+    }
+    .hamburger div:before{ top:-6px; }
+    .hamburger div:after{ top:6px; }
+
+    /* Mobile menu */
+    .mobile{
+      display:none;
+      border-top:1px solid var(--line);
+      padding:10px 0 14px;
+    }
+    .mobile a{
+      display:block;
+      padding:12px 10px;
+      border-radius:14px;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .mobile a:hover{ background: rgba(255,255,255,.06); color:var(--text); }
+    .mobile .row{ display:flex; gap:10px; padding-top:8px; }
+
+    /* Hero */
+    .hero{
+      padding: 64px 0 28px;
+      position:relative;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap:26px;
+      align-items:stretch;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(56,189,248,.28);
+      background: rgba(56,189,248,.10);
+      color: rgba(234,242,255,.88);
+      font-weight:800;
+      width:fit-content;
+    }
+    .pill .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px rgba(56,189,248,.18);
+    }
+    h1{
+      margin:14px 0 10px;
+      font-size: clamp(34px, 4.2vw, 52px);
+      line-height:1.05;
+      letter-spacing:-.8px;
+    }
+    .sub{
+      color:var(--muted);
+      font-size: 16.5px;
+      line-height:1.6;
+      max-width: 58ch;
+      margin: 0 0 18px;
+    }
+    .hero-actions{ display:flex; gap:10px; flex-wrap:wrap; margin: 18px 0 10px; }
+    .mini{
+      display:flex; gap:14px; flex-wrap:wrap;
+      margin-top: 18px;
+      color: rgba(234,242,255,.70);
+      font-weight:700;
+      font-size: 13.5px;
+    }
+    .mini span{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+    .mini i{
+      width:18px; height:18px; border-radius:6px;
+      display:inline-flex; align-items:center; justify-content:center;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      font-style:normal;
+    }
+
+    /* Hero card */
+    .hero-card{
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-card:before{
+      content:"";
+      position:absolute; inset:-40% -30%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(56,189,248,.25), transparent 55%),
+        radial-gradient(circle at 70% 60%, rgba(34,197,94,.18), transparent 55%);
+      filter: blur(0px);
+    }
+    .hero-card > *{ position:relative; }
+
+    .card-top{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      margin-bottom: 12px;
+    }
+    .badge{
+      font-weight:900;
+      font-size:12px;
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,242,255,.85);
+    }
+    .stat{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top: 10px;
+    }
+    .stat .tile{
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .tile .k{ color: rgba(234,242,255,.72); font-weight:800; font-size:12px; }
+    .tile .v{ font-weight:950; font-size:18px; margin-top:6px; letter-spacing:-.2px; }
+    .progress{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .bar > div{
+      height:100%;
+      width: 68%;
+      background: linear-gradient(90deg, rgba(56,189,248,.95), rgba(34,197,94,.75));
+      border-radius: 999px;
+    }
+    .progress .row{
+      display:flex; justify-content:space-between; align-items:center;
+      color: rgba(234,242,255,.78);
+      font-weight:800;
+      font-size:12px;
+      margin-bottom: 10px;
+    }
+
+    /* Sections */
+    section{ padding: 44px 0; }
+    .section-title{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+      margin-bottom: 18px;
+    }
+    .section-title h2{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:-.3px;
+    }
+    .section-title p{
+      margin:0;
+      color: var(--muted);
+      max-width: 60ch;
+      line-height:1.5;
+      font-weight:650;
+      font-size:14.5px;
+    }
+
+    .grid3{ display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; }
+    .grid2{ display:grid; grid-template-columns: repeat(2, 1fr); gap:14px; }
+
+    .card{
+      padding: 16px;
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      box-shadow: 0 12px 26px rgba(0,0,0,.18);
+    }
+    .card:hover{ border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.06); }
+    .icon{
+      width:42px; height:42px;
+      border-radius: 16px;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      font-size:18px;
+    }
+    .card h3{ margin: 12px 0 6px; font-size:16px; letter-spacing:-.2px; }
+    .card p{ margin:0; color: var(--muted); line-height:1.55; font-weight:650; font-size:14px; }
+
+    /* Subject cards */
+    .subject{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    .tag{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(234,242,255,.80);
+      font-weight:800;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    /* Testimonials */
+    .quote{
+      font-weight:700;
+      color: rgba(234,242,255,.86);
+      line-height:1.55;
+      margin: 0 0 10px;
+    }
+    .who{
+      display:flex; align-items:center; gap:10px;
+      color: var(--muted);
+      font-weight:750;
+      font-size: 13px;
+    }
+    .avatar{
+      width:36px; height:36px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(56,189,248,.85), rgba(245,158,11,.40));
+      border:1px solid rgba(255,255,255,.18);
+    }
+
+    /* Pricing */
+    .price{
+      display:flex; align-items:flex-end; gap:8px;
+      margin: 10px 0 14px;
+    }
+    .price .big{ font-size:34px; font-weight:950; letter-spacing:-.6px; }
+    .price .per{ color: var(--muted); font-weight:800; padding-bottom:6px; }
+
+    ul.clean{
+      list-style:none; padding:0; margin: 0 0 14px;
+      display:grid; gap:10px;
+      color: rgba(234,242,255,.78);
+      font-weight:750;
+      font-size: 13.5px;
+    }
+    ul.clean li{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .check{
+      width:18px; height:18px; border-radius: 6px;
+      display:inline-flex; align-items:center; justify-content:center;
+      background: rgba(34,197,94,.20);
+      border:1px solid rgba(34,197,94,.35);
+      color: rgba(234,242,255,.90);
+      font-size:12px;
+      flex:0 0 auto;
+      margin-top:1px;
+    }
+
+    /* CTA */
+    .cta{
+      padding: 18px;
+      border-radius: calc(var(--radius) + 4px);
+      border:1px solid rgba(56,189,248,.26);
+      background: linear-gradient(135deg, rgba(56,189,248,.15), rgba(34,197,94,.10));
+      display:flex; align-items:center; justify-content:space-between; gap:18px;
+      box-shadow: var(--shadow);
+    }
+    .cta h3{ margin:0; font-size:18px; letter-spacing:-.2px; }
+    .cta p{ margin:6px 0 0; color: var(--muted); font-weight:650; }
+    .cta .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    /* Footer */
+    footer{
+      padding: 30px 0 40px;
+      border-top:1px solid var(--line);
+      color: var(--muted);
+      font-weight:650;
+      font-size: 13.5px;
+    }
+    .foot{
+      display:flex; justify-content:space-between; align-items:flex-start; gap:18px;
+      flex-wrap:wrap;
+    }
+    .foot a{ color: rgba(234,242,255,.74); }
+    .foot a:hover{ color: rgba(234,242,255,.95); }
+    .foot .cols{ display:flex; gap:28px; flex-wrap:wrap; }
+    .foot .col{ min-width: 140px; display:grid; gap:10px; }
+
+    /* Responsive */
+    @media (max-width: 920px){
+      .hero-grid{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px){
+      .nav-links{ display:none; }
+      .nav-cta{ display:none; }
+      .hamburger{ display:flex; }
+      .mobile{ display:none; }
+      .grid3{ grid-template-columns: 1fr; }
+      .grid2{ grid-template-columns: 1fr; }
+    }
+
+    /* Smooth scroll */
+    html{ scroll-behavior:smooth; }
+    
+    /* Newsletter */
+.newsletter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:22px;
+  border-radius: calc(var(--radius) + 6px);
+  border:1px solid rgba(56,189,248,.28);
+  background:
+    linear-gradient(135deg,
+      rgba(56,189,248,.18),
+      rgba(34,197,94,.12)
+    );
+  box-shadow: var(--shadow);
+}
+
+.newsletter-text h3{
+  margin:0;
+  font-size:20px;
+  letter-spacing:-.2px;
+}
+
+.newsletter-text p{
+  margin:6px 0 0;
+  color: var(--muted);
+  font-weight:650;
+  max-width: 48ch;
+}
+
+.newsletter-form{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.newsletter-form input{
+  min-width: 240px;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.12);
+  color: var(--text);
+  font-weight:700;
+  outline:none;
+}
+
+.newsletter-form input::placeholder{
+  color: rgba(234,242,255,.55);
+}
+
+.newsletter-form input:focus{
+  border-color: rgba(56,189,248,.55);
+  box-shadow: 0 0 0 4px rgba(56,189,248,.18);
+}
+
+/* Mobile stacking */
+@media (max-width: 760px){
+  .newsletter{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .newsletter-form{
+    width:100%;
+  }
+
+  .newsletter-form input{
+    flex:1;
+    min-width: unset;
+  }
+
+  .newsletter-form button{
+    width:100%;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top" aria-label="Ocean-Learn Home">
+        <div class="logo" aria-hidden="true"></div>
+        <span>Ocean-Learn</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#features">Features</a>
+        <a href="#subjects">Subjects</a>
+        <a href="#how">How it works</a>
+        <a href="#pricing">Pricing</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a class="btn" href="#pricing">View plans</a>
+        <a class="btn primary" href="#get-started">Get started</a>
+      </div>
+
+      <button class="hamburger" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <div></div>
+      </button>
+    </div>
+
+    <div class="container mobile" id="mobileMenu" aria-label="Mobile menu">
+      <a href="#features">Features</a>
+      <a href="#subjects">Subjects</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <div class="row">
+        <a class="btn" href="#pricing" style="flex:1;">View plans</a>
+        <a class="btn primary" href="#get-started" style="flex:1;">Get started</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="pill"><span class="dot"></span> Learn smarter. Dive deeper.</div>
+          <h1>Ocean-Learn helps you build skills with interactive lessons, quizzes, and real progress.</h1>
+          <p class="sub">
+            A calm, focused learning space designed for students. Track your streaks, practice with bite-size quizzes,
+            and master concepts with ocean-smooth pacing.
+          </p>
+
+          <div class="hero-actions" id="get-started">
+            <a class="btn primary" href="#pricing">Start learning</a>
+            <a class="btn" href="#subjects">Browse subjects</a>
+            <a class="btn" href="#how">See how it works</a>
+          </div>
+
+          <div class="mini">
+            <span><i>⚡</i> Quick lessons</span>
+            <span><i>🧠</i> Recall quizzes</span>
+            <span><i>📈</i> Progress tracking</span>
+            <span><i>🏆</i> Streaks & badges</span>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Progress preview">
+          <div class="card-top">
+            <div class="badge">Today’s mission</div>
+            <div class="badge" style="border-color: rgba(34,197,94,.30);">Streak: 6 days</div>
+          </div>
+
+          <div class="card" style="margin:0; background: rgba(255,255,255,.05);">
+            <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
+              <div>
+                <div style="font-weight:950; font-size:16px; letter-spacing:-.2px;">Ocean Basics: Currents</div>
+                <div style="color: var(--muted); font-weight:700; font-size:13px; margin-top:4px;">Lesson • 8 min</div>
+              </div>
+              <span class="tag" style="border-color: rgba(56,189,248,.28); background: rgba(56,189,248,.10);">Recommended</span>
+            </div>
+
+            <div class="progress" style="margin-top:12px;">
+              <div class="row">
+                <span>Daily progress</span>
+                <span>67%</span>
+              </div>
+              <div class="bar"><div></div></div>
+              <div style="margin-top:10px; color: var(--muted); font-weight:700; font-size:12.5px;">
+                Finish one more quiz to hit your goal.
+              </div>
+            </div>
+
+            <div class="stat">
+              <div class="tile">
+                <div class="k">Lessons completed</div>
+                <div class="v">24</div>
+              </div>
+              <div class="tile">
+                <div class="k">Accuracy</div>
+                <div class="v">92%</div>
+              </div>
+              <div class="tile">
+                <div class="k">Time today</div>
+                <div class="v">14m</div>
+              </div>
+              <div class="tile">
+                <div class="k">Badges</div>
+                <div class="v">7</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>Built for focus, not distraction</h2>
+            <p>Everything on Ocean-Learn is designed to keep learning simple, calm, and consistent.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card">
+            <div class="icon">🧩</div>
+            <h3>Interactive lessons</h3>
+            <p>Learn by doing with examples, checkpoints, and instant feedback.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🧠</div>
+            <h3>Recall quizzes</h3>
+            <p>Short quizzes that strengthen memory and improve test performance.</p>
+          </div>
+          <div class="card">
+            <div class="icon">📈</div>
+            <h3>Progress that makes sense</h3>
+            <p>Track streaks, mastery, and what to practice next—without the noise.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="subjects">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>Subjects to explore</h2>
+            <p>Start with a track, then level up. Add more subjects anytime.</p>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card subject">
+            <div>
+              <div style="font-weight:950; font-size:16px;">Math</div>
+              <div style="color:var(--muted); font-weight:700; margin-top:6px;">Algebra, geometry, and problem-solving.</div>
+            </div>
+            <span class="tag">40 lessons</span>
+          </div>
+
+          <div class="card subject">
+            <div>
+              <div style="font-weight:950; font-size:16px;">Science</div>
+              <div style="color:var(--muted); font-weight:700; margin-top:6px;">Biology, physics, chemistry—made clear.</div>
+            </div>
+            <span class="tag">32 lessons</span>
+          </div>
+
+          <div class="card subject">
+            <div>
+              <div style="font-weight:950; font-size:16px;">Coding</div>
+              <div style="color:var(--muted); font-weight:700; margin-top:6px;">Build projects with HTML, CSS, and JavaScript.</div>
+            </div>
+            <span class="tag">28 lessons</span>
+          </div>
+
+          <div class="card subject">
+            <div>
+              <div style="font-weight:950; font-size:16px;">Reading & Writing</div>
+              <div style="color:var(--muted); font-weight:700; margin-top:6px;">Vocabulary, essays, comprehension skills.</div>
+            </div>
+            <span class="tag">25 lessons</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>How it works</h2>
+            <p>A simple loop that keeps you moving forward—one small win at a time.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card">
+            <div class="icon">1️⃣</div>
+            <h3>Pick a track</h3>
+            <p>Choose what you want to learn and set a daily goal that’s realistic.</p>
+          </div>
+          <div class="card">
+            <div class="icon">2️⃣</div>
+            <h3>Learn + practice</h3>
+            <p>Read a short lesson, then lock it in with a 2–5 minute quiz.</p>
+          </div>
+          <div class="card">
+            <div class="icon">3️⃣</div>
+            <h3>Build mastery</h3>
+            <p>Ocean-Learn recommends what to review next based on your progress.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Testimonials">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>Learners love the calm vibe</h2>
+            <p>Simple, focused, and actually motivating.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card">
+            <p class="quote">“The lessons are short enough that I actually finish them. The streaks keep me going.”</p>
+            <div class="who"><span class="avatar"></span> Maya • Student</div>
+          </div>
+          <div class="card">
+            <p class="quote">“I like that it tells me what to practice next. No guessing.”</p>
+            <div class="who"><span class="avatar"></span> Jordan • Learner</div>
+          </div>
+          <div class="card">
+            <p class="quote">“The quizzes are quick, but they help a lot. My accuracy improved fast.”</p>
+            <div class="who"><span class="avatar"></span> Sam • Student</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="container">
+        <div class="section-title">
+          <div>
+            <h2>Pricing</h2>
+            <p>Start free, upgrade when you want deeper tracking and more content.</p>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card">
+            <div class="badge">Free</div>
+            <div class="price"><div class="big">$0</div><div class="per">/ month</div></div>
+            <ul class="clean">
+              <li><span class="check">✓</span>Core lessons</li>
+              <li><span class="check">✓</span>Basic quizzes</li>
+              <li><span class="check">✓</span>Weekly progress summary</li>
+            </ul>
+            <a class="btn" href="#get-started" style="width:100%;">Create account</a>
+          </div>
+
+          <div class="card" style="border-color: rgba(56,189,248,.30); background: rgba(56,189,248,.08);">
+            <div class="badge" style="border-color: rgba(56,189,248,.35);">Most popular</div>
+            <div class="price"><div class="big">$8</div><div class="per">/ month</div></div>
+            <ul class="clean">
+              <li><span class="check">✓</span>All subjects + tracks</li>
+              <li><span class="check">✓</span>Mastery + streak analytics</li>
+              <li><span class="check">✓</span>Personalized review queue</li>
+              <li><span class="check">✓</span>Offline lesson saves</li>
+            </ul>
+            <a class="btn primary" href="#get-started" style="width:100%;">Start Pro</a>
+          </div>
+
+          <div class="card">
+            <div class="badge">Family</div>
+            <div class="price"><div class="big">$15</div><div class="per">/ month</div></div>
+            <ul class="clean">
+              <li><span class="check">✓</span>Up to 5 learner profiles</li>
+              <li><span class="check">✓</span>Parent dashboard</li>
+              <li><span class="check">✓</span>Goal settings per learner</li>
+              <li><span class="check">✓</span>Weekly email reports</li>
+            </ul>
+            <a class="btn" href="#get-started" style="width:100%;">Choose Family</a>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="cta">
+            <div>
+              <h3>Ready to dive in?</h3>
+              <p>Create your account and finish your first lesson today.</p>
+            </div>
+            <div class="actions">
+              <a class="btn primary" href="#get-started">Get started</a>
+              <a class="btn" href="#subjects">Browse subjects</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+<section aria-label="Newsletter signup">
+  <div class="container">
+    <div class="newsletter">
+      <div class="newsletter-text">
+        <h3>🌊 Stay in the loop</h3>
+        <p>
+          Get weekly learning tips from <strong style="color: rgb(17, 22, 122);"><i>admins</i></strong> at <strong style="color: rgb(0, 255, 255);"><i>Ocean-Learn</i></strong>, new lessons, and Ocean-Learn updates straight
+          to from ocean-learn<strong style="color: rgb(0, 156, 156);"><i>.com</i></strong>, No spam. Ever.
+        </p>
+      </div>
+
+      <form class="newsletter-form" onsubmit="handleNewsletterSignup(event)">
+        <input
+          type="email"
+          id="newsletterEmail"
+          placeholder="Enter your email"
+          required
+        />
+        <button type="submit" class="btn primary">
+          Subscribe
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+    <footer>
+      <div class="container foot">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <div class="logo" style="width:32px; height:32px; border-radius:12px;"></div>
+            <div style="font-weight:900; color: rgba(234,242,255,.85);">Ocean-Learn</div>
+          </div>
+          <div>© <span id="year"></span> Ocean-Learn. Learn smarter, dive deeper.</div>
+        </div>
+
+        <div class="cols">
+          <div class="col">
+            <div style="color: rgba(234,242,255,.85); font-weight:900;">Product</div>
+            <a href="#features">Features</a>
+            <a href="#subjects">Subjects</a>
+            <a href="#pricing">Pricing</a>
+          </div>
+          <div class="col">
+            <div style="color: rgba(234,242,255,.85); font-weight:900;">Company</div>
+            <a href="#top">About</a>
+            <a href="#how">How it works</a>
+            <a href="#get-started">Get started</a>
+          </div>
+          <div class="col">
+            <div style="color: rgba(234,242,255,.85); font-weight:900;">Support</div>
+            <a href="#top">Help Center</a>
+            <a href="#top">Contact</a>
+            <a href="#top">Privacy</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Mobile menu toggle
+    const btn = document.getElementById("menuBtn");
+    const menu = document.getElementById("mobileMenu");
+
+    btn?.addEventListener("click", () => {
+      const open = menu.style.display === "block";
+      menu.style.display = open ? "none" : "block";
+      btn.setAttribute("aria-expanded", String(!open));
+    });
+
+    // Close mobile menu when clicking a link
+    menu?.querySelectorAll("a").forEach(a => {
+      a.addEventListener("click", () => {
+        menu.style.display = "none";
+        btn.setAttribute("aria-expanded", "false");
+      });
+    });
+    
+
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
