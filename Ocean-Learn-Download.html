@@ -261,6 +261,10 @@ async function fetchText(url) {
             img.loading = 'lazy'
             img.alt = 'name'
 
+			if (name == 'sandstone') {
+				OuterDiv.style.display = 'none';
+			}
+			
             let hoverText = document.createElement('h1')
             hoverText.classList = 'hover-text'
             hoverText.textContent = name
@@ -395,6 +399,9 @@ searchInput.addEventListener("input", () => {
     searchGms(searchInput.value);
 });
 
+
+		window.top.document.title = 'oceanic gms'
+		
     </script>
 </body>
 </html>
